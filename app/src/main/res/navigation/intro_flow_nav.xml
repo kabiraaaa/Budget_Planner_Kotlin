@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/intro_flow_nav"
+    app:startDestination="@id/introFragment">
+
+    <fragment
+        android:id="@+id/introInvestmentFragment"
+        android:name="com.sample.budgetplanner.fragments.IntroGoalFragment"
+        android:label="fragment_intro_investment"
+        tools:layout="@layout/fragment_intro_goal" >
+        <action
+            android:id="@+id/action_introInvestmentFragment_to_introBudgetFragment"
+            app:destination="@id/introBudgetFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/introIncomeFragment"
+        android:name="com.sample.budgetplanner.fragments.IntroBasicDetailsFragment"
+        android:label="fragment_intro_income"
+        tools:layout="@layout/fragment_intro_basic_details" >
+        <action
+            android:id="@+id/action_introIncomeFragment_to_introInvestmentFragment"
+            app:destination="@id/introInvestmentFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/introFragment"
+        android:name="com.sample.budgetplanner.fragments.IntroFragment"
+        android:label="fragment_intro"
+        tools:layout="@layout/fragment_intro" />
+    <dialog
+        android:id="@+id/introLoginBottomSheet"
+        android:name="com.sample.budgetplanner.IntroLoginBottomSheet"
+        android:label="bottom_sheet_intro_login"
+        tools:layout="@layout/bottom_sheet_intro_login" >
+        <action
+            android:id="@+id/action_introLoginBottomSheet_to_introIncomeFragment"
+            app:destination="@id/introIncomeFragment" />
+    </dialog>
+    <fragment
+        android:id="@+id/introBudgetFragment"
+        android:name="com.sample.budgetplanner.fragments.IntroBudgetFragment"
+        android:label="fragment_intro_budget"
+        tools:layout="@layout/fragment_intro_budget" >
+        <action
+            android:id="@+id/action_introBudgetFragment_to_homeFragment"
+            app:destination="@id/homeFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.sample.budgetplanner.fragments.HomeFragment"
+        android:label="fragment_home"
+        tools:layout="@layout/fragment_home" />
+</navigation>

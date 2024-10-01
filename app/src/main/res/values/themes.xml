@@ -1,0 +1,32 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Base.Theme.BudgetPlanner" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="android:statusBarColor">@color/homeChipColorSelected</item>
+    </style>
+
+    <style name="Theme.BudgetPlanner" parent="Base.Theme.BudgetPlanner" />
+
+    <style name="whiteBold" parent="TextAppearance.AppCompat">
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="blackBold" parent="TextAppearance.AppCompat">
+        <item name="android:textColor">#000000</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="greyF2F2F2Bold" parent="TextAppearance.AppCompat">
+        <item name="android:textColor">#F2F2F2</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="Widget.App.Chip" parent="Widget.Material3.Chip.Suggestion.Elevated">
+        <item name="chipBackgroundColor">@color/white</item>
+        <item name="chipStrokeWidth">2dp</item>
+        <item name="chipStrokeColor">@color/home_chip_background_color</item>
+        <item name="checkedIconVisible">false</item>
+        <item name="shapeAppearanceOverlay">@null</item>
+    </style>
+
+</resources>
