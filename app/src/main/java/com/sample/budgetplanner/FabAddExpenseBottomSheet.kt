@@ -20,6 +20,8 @@ class FabAddExpenseBottomSheet(private val listener: AddExpense) :
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = BottomSheetFabAddExpenseBinding.bind(view)
+        binding.tvDate.text = currentDate
+        binding.tvTime.text = currentTime
         initClickListeners()
     }
 
@@ -30,9 +32,6 @@ class FabAddExpenseBottomSheet(private val listener: AddExpense) :
             val paymentMode = binding.etPaymentMode.text.toString()
             val category = binding.etCategory.text.toString()
             val notes = binding.etNotes.text.toString()
-
-            binding.tvDate.text = currentDate
-            binding.tvTime.text = currentTime
 
             listener.onExpenseAdded(
                 name,

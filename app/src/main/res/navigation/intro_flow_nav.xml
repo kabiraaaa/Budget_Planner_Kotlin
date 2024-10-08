@@ -37,6 +37,9 @@
         <action
             android:id="@+id/action_introLoginBottomSheet_to_introIncomeFragment"
             app:destination="@id/introIncomeFragment" />
+        <action
+            android:id="@+id/action_introLoginBottomSheet_to_firebaseProfileUpdateFragment"
+            app:destination="@id/firebaseProfileUpdateFragment" />
     </dialog>
     <fragment
         android:id="@+id/introBudgetFragment"
@@ -52,4 +55,13 @@
         android:name="com.sample.budgetplanner.fragments.HomeFragment"
         android:label="fragment_home"
         tools:layout="@layout/fragment_home" />
+    <fragment
+        android:id="@+id/firebaseProfileUpdateFragment"
+        android:name="com.sample.budgetplanner.fragments.FirebaseProfileUpdateFragment"
+        android:label="fragment_firebase_profile_update"
+        tools:layout="@layout/fragment_firebase_profile_update" >
+        <action
+            android:id="@+id/action_firebaseProfileUpdateFragment_to_homeFragment"
+            app:destination="@id/homeFragment" />
+    </fragment>
 </navigation>

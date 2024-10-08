@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
     id("com.google.devtools.ksp")
+    alias(libs.plugins.google.gms.google.services)
 }
 
 android {
@@ -48,6 +49,8 @@ dependencies {
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.navigation.ui.ktx)
+    implementation(libs.firebase.auth)
+    implementation(libs.play.services.auth)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -55,4 +58,9 @@ dependencies {
     implementation("androidx.room:room-runtime:2.6.1")
     ksp("androidx.room:room-compiler:2.6.1")
     implementation("androidx.room:room-ktx:2.6.1")
+
+    implementation("com.github.bumptech.glide:glide:4.15.1")
+    ksp("com.github.bumptech.glide:compiler:4.15.1")
+
+    implementation("androidx.datastore:datastore-preferences:1.0.0")
 }

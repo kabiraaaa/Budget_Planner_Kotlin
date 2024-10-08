@@ -7,10 +7,23 @@
     android:background="#F3F3F3"
     tools:context=".fragments.IntroFragment">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/viewPager"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:background="@color/homeChipColorSelected"
+        android:layout_weight="1"
+        app:layout_constraintBottom_toTopOf="@id/clBottomIntro"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/clBottomIntro"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:background="@drawable/bg_intro_bottom"
+        app:layout_constraintTop_toBottomOf="@id/viewPager"
         android:paddingHorizontal="16dp"
         android:paddingVertical="32dp"
         app:layout_constraintBottom_toBottomOf="parent"

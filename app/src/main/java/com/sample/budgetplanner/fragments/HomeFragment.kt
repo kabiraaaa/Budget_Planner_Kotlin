@@ -5,6 +5,8 @@ import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.bumptech.glide.Glide
+import com.google.firebase.auth.FirebaseAuth
 import com.sample.budgetplanner.FabAddExpenseBottomSheet
 import com.sample.budgetplanner.MyApp
 import com.sample.budgetplanner.R
@@ -33,12 +35,6 @@ class HomeFragment : Fragment(R.layout.fragment_home), FabAddExpenseBottomSheet.
         val factory = TransactionsViewModelFactory(repository)
         transactionViewModel = ViewModelProvider(this, factory)[TransactionsViewModel::class.java]
 
-        repeat(5) {
-            transactionViewModel.insertTransaction(
-                Transactions(0, "Alice", 5.00, "abc", "def", "ghi", "jkl", "mno")
-            )
-        }
-
         initRecyclerView()
 
         binding.fabHomeAdd.setOnClickListener {
@@ -51,6 +47,21 @@ class HomeFragment : Fragment(R.layout.fragment_home), FabAddExpenseBottomSheet.
 
         binding.tvTotalAmountMonth.text =
             "Month: ${SimpleDateFormat("MMMM", Locale.getDefault()).format(Date())}"
+
+        showProfileImageAndName()
+    }
+
+    private fun showProfileImageAndName() {
+        val user = FirebaseAuth.getInstance().currentUser
+        val photoUrl = user?.photoUrl
+
+        if (photoUrl != null) {
+            Glide.with(this)
+                .load(photoUrl)
+                .into(binding.ivHomeProfile)
+        }
+
+        binding.tvUserName.text = user?.displayName
     }
 
     private fun initRecyclerView() {
