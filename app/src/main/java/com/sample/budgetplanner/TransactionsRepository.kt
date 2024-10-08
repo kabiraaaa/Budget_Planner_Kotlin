@@ -10,4 +10,6 @@ class TransactionsRepository(private val transactionsDao: TransactionsDao) {
 
     suspend fun insertTransaction(transaction: Transactions) =
         transactionsDao.insertTransaction(transaction)
+
+    fun getTotalAmount(): LiveData<Double> = transactionsDao.getTotalAmount()
 }

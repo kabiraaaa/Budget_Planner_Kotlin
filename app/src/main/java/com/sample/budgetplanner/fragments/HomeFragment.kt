@@ -1,8 +1,11 @@
 package com.sample.budgetplanner.fragments
 
+import android.os.Build
 import android.os.Bundle
 import android.view.View
+import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
@@ -17,6 +20,7 @@ import com.sample.budgetplanner.view_models.TransactionsViewModel
 import com.sample.budgetplanner.view_models.TransactionsViewModelFactory
 import com.xsdev.pdfreader.pdfeditor.pdf.document.adapters.TransactionsAdapter
 import java.text.SimpleDateFormat
+import java.time.LocalTime
 import java.util.Date
 import java.util.Locale
 
@@ -26,6 +30,7 @@ class HomeFragment : Fragment(R.layout.fragment_home), FabAddExpenseBottomSheet.
     private lateinit var transactionViewModel: TransactionsViewModel
     private val TAG = "HomeFragment"
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentHomeBinding.bind(view)
@@ -45,12 +50,22 @@ class HomeFragment : Fragment(R.layout.fragment_home), FabAddExpenseBottomSheet.
             )
         }
 
+
+
+        showProfileImageAndName()
+        setUpTotalAmountAndMonth()
+    }
+
+    private fun setUpTotalAmountAndMonth() {
         binding.tvTotalAmountMonth.text =
             "Month: ${SimpleDateFormat("MMMM", Locale.getDefault()).format(Date())}"
 
-        showProfileImageAndName()
+        transactionViewModel.getTotalAmount().observe(viewLifecycleOwner) { totalAmount ->
+            binding.tvTotalAmount.text = "$${totalAmount ?: 0.0}"
+        }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun showProfileImageAndName() {
         val user = FirebaseAuth.getInstance().currentUser
         val photoUrl = user?.photoUrl
@@ -60,7 +75,7 @@ class HomeFragment : Fragment(R.layout.fragment_home), FabAddExpenseBottomSheet.
                 .load(photoUrl)
                 .into(binding.ivHomeProfile)
         }
-
+        binding.tvGreetings.text = showGreetingBasedOnTime()
         binding.tvUserName.text = user?.displayName
     }
 
@@ -85,5 +100,16 @@ class HomeFragment : Fragment(R.layout.fragment_home), FabAddExpenseBottomSheet.
         transactionViewModel.insertTransaction(
             Transactions(0, name, amount, category, paymentMode, currentDate, currentTime, notes)
         )
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun showGreetingBasedOnTime(): String {
+        val currentTime = LocalTime.now()
+        return when (currentTime.hour) {
+            in 0..11 -> "Good Morning!"
+            in 12..16 -> "Good Afternoon!"
+            in 17..20 -> "Good Evening!"
+            else -> "Good Night!"
+        }
     }
 }

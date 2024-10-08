@@ -17,5 +17,7 @@ class TransactionsViewModel(private val userRepository: TransactionsRepository) 
             userRepository.insertTransaction(transaction)
         }
     }
+
+    fun getTotalAmount(): LiveData<Double> = userRepository.getTotalAmount()
 }
 

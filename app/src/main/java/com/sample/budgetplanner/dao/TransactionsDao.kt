@@ -15,4 +15,7 @@ interface TransactionsDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertTransaction(transaction: Transactions)
+
+    @Query("SELECT SUM(amount) FROM transactions")
+    fun getTotalAmount(): LiveData<Double>
 }
