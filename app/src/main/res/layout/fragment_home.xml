@@ -121,6 +121,7 @@
                             android:textColor="#BBBBBB" />
 
                         <TextView
+                            android:id="@+id/tvOutgoingAmount"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="$0.00"
@@ -158,6 +159,7 @@
                             android:textColor="#797979" />
 
                         <TextView
+                            android:id="@+id/tvIncomingAmount"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="$0.00"
@@ -250,7 +252,7 @@
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tvTotalAmount"/>
+            app:layout_constraintTop_toBottomOf="@id/tvTotalAmount" />
 
         <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
             android:id="@+id/fabHomeAdd"

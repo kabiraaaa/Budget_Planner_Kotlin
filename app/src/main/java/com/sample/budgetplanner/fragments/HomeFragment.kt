@@ -5,8 +5,8 @@ import android.os.Bundle
 import android.view.View
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.google.firebase.auth.FirebaseAuth
@@ -16,11 +16,16 @@ import com.sample.budgetplanner.R
 import com.sample.budgetplanner.TransactionsRepository
 import com.sample.budgetplanner.databinding.FragmentHomeBinding
 import com.sample.budgetplanner.models.Transactions
+import com.sample.budgetplanner.utils.DataStoreHelper.getMonthlySalary
+import com.sample.budgetplanner.utils.DataStoreHelper.getMonthlySpend
 import com.sample.budgetplanner.view_models.TransactionsViewModel
 import com.sample.budgetplanner.view_models.TransactionsViewModelFactory
 import com.xsdev.pdfreader.pdfeditor.pdf.document.adapters.TransactionsAdapter
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.time.LocalTime
+import java.util.Currency
 import java.util.Date
 import java.util.Locale
 
@@ -50,8 +55,6 @@ class HomeFragment : Fragment(R.layout.fragment_home), FabAddExpenseBottomSheet.
             )
         }
 
-
-
         showProfileImageAndName()
         setUpTotalAmountAndMonth()
     }
@@ -63,6 +66,40 @@ class HomeFragment : Fragment(R.layout.fragment_home), FabAddExpenseBottomSheet.
         transactionViewModel.getTotalAmount().observe(viewLifecycleOwner) { totalAmount ->
             binding.tvTotalAmount.text = "$${totalAmount ?: 0.0}"
         }
+        observeUserFinanceData()
+    }
+
+    private fun observeUserFinanceData() {
+        // Observe the user's monthly salary from DataStore and display it
+        lifecycleScope.launch {
+            // Collect the monthly salary from DataStore
+            val salary = getMonthlySalary(requireContext()).firstOrNull() ?: 0.0
+
+            // Display the monthly salary with currency symbol
+            val formattedSalary = "${Currency.getInstance(Locale.getDefault()).symbol} $salary"
+            binding.tvIncomingAmount.text = formattedSalary
+
+            // Get the monthly spend from DataStore
+            val spend = getMonthlySpend(requireContext()).firstOrNull() ?: 0.0
+
+            // Observe the total transactions for the current month
+            transactionViewModel.totalAmountForCurrentMonth.observe(viewLifecycleOwner) { totalAmount ->
+                val transactionAmount = totalAmount ?: 0.0
+
+                // Combine monthly spend and current month's transactions
+                val combinedAmount =
+                    "${Currency.getInstance(Locale.getDefault()).symbol} ${spend + transactionAmount}"
+
+                // Display the combined outgoing amount in the TextView
+                binding.tvOutgoingAmount.text = combinedAmount
+
+                // Calculate and display the balance
+                val balance = salary - (spend + transactionAmount)
+                binding.tvBalance.text = "Balance: ${Currency.getInstance(Locale.getDefault()).symbol} $balance"
+            }
+        }
+
+
     }
 
     @RequiresApi(Build.VERSION_CODES.O)

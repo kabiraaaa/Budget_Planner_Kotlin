@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.sample.budgetplanner.MainActivity
+import com.sample.budgetplanner.RemoteConfigHelper
 import com.sample.budgetplanner.databinding.ActivitySplashScreenBinding
 import com.sample.budgetplanner.utils.DataStoreHelper
 import kotlinx.coroutines.CoroutineScope
@@ -20,6 +21,10 @@ class SplashActivity : AppCompatActivity() {
 
 //        binding = ActivitySplashScreenBinding.inflate(layoutInflater)
 //        setContentView(binding.root)
+
+        CoroutineScope(Dispatchers.IO).launch{
+            RemoteConfigHelper.initializeRemoteConfig()
+        }
 
         CoroutineScope(Dispatchers.Main).launch {
             delay(1500)

@@ -97,6 +97,7 @@
             android:src="@drawable/bg_cursor" />
 
         <EditText
+            android:id="@+id/etSalary"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@null"
@@ -152,6 +153,7 @@
             android:src="@drawable/bg_cursor" />
 
         <EditText
+            android:id="@+id/etSpends"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@null"
@@ -164,6 +166,21 @@
             android:textSize="20sp" />
 
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/btnGoalSkip"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:padding="12dp"
+        android:text="Skip and Continue"
+        android:textColor="#9B9B9B"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@id/btnIncomeContinue"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
         android:id="@+id/btnIncomeContinue"

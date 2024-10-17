@@ -19,5 +19,7 @@ class TransactionsViewModel(private val userRepository: TransactionsRepository) 
     }
 
     fun getTotalAmount(): LiveData<Double> = userRepository.getTotalAmount()
-}
 
+    val totalAmountForCurrentMonth: LiveData<Double> =
+        userRepository.getTotalAmountForCurrentMonth()
+}

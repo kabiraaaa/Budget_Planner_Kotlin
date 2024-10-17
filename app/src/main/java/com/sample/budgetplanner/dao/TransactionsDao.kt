@@ -18,4 +18,7 @@ interface TransactionsDao {
 
     @Query("SELECT SUM(amount) FROM transactions")
     fun getTotalAmount(): LiveData<Double>
+
+    @Query("SELECT SUM(amount) FROM transactions WHERE strftime('%m', date) = :month AND strftime('%Y', date) = :year")
+    fun getTotalAmountForCurrentMonth(month: String, year: String): LiveData<Double>
 }
