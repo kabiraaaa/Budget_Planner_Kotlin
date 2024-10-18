@@ -1,4 +1,4 @@
-package com.xsdev.pdfreader.pdfeditor.pdf.document.adapters
+package com.sample.budgetplanner.adapters
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -6,6 +6,8 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.sample.budgetplanner.databinding.ItemTransactionsBinding
 import com.sample.budgetplanner.models.Transactions
+import java.util.Currency
+import java.util.Locale
 
 class TransactionsAdapter(private val context: Context) :
     RecyclerView.Adapter<TransactionsAdapter.FileItemViewHolder>() {
@@ -35,10 +37,11 @@ class TransactionsAdapter(private val context: Context) :
     class FileItemViewHolder(private val binding: ItemTransactionsBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(file: Transactions) {
-            binding.tvTransactionName.text = file.name
-            binding.tvTransactionAmount.text = file.amount.toString()
-            binding.tvTransactionDate.text = "${file.date} | ${file.time}"
+        fun bind(transactions: Transactions) {
+            binding.tvTransactionName.text = transactions.name
+            binding.tvTransactionAmount.text =
+                "${Currency.getInstance(Locale.getDefault()).symbol} ${transactions.amount}"
+            binding.tvTransactionDate.text = "${transactions.date} | ${transactions.time}"
         }
     }
 }

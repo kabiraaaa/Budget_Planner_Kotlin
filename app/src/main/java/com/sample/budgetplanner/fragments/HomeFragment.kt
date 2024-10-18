@@ -20,7 +20,7 @@ import com.sample.budgetplanner.utils.DataStoreHelper.getMonthlySalary
 import com.sample.budgetplanner.utils.DataStoreHelper.getMonthlySpend
 import com.sample.budgetplanner.view_models.TransactionsViewModel
 import com.sample.budgetplanner.view_models.TransactionsViewModelFactory
-import com.xsdev.pdfreader.pdfeditor.pdf.document.adapters.TransactionsAdapter
+import com.sample.budgetplanner.adapters.TransactionsAdapter
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -64,7 +64,7 @@ class HomeFragment : Fragment(R.layout.fragment_home), FabAddExpenseBottomSheet.
             "Month: ${SimpleDateFormat("MMMM", Locale.getDefault()).format(Date())}"
 
         transactionViewModel.getTotalAmount().observe(viewLifecycleOwner) { totalAmount ->
-            binding.tvTotalAmount.text = "$${totalAmount ?: 0.0}"
+            binding.tvTotalAmount.text = "${Currency.getInstance(Locale.getDefault()).symbol} ${totalAmount ?: 0.0}"
         }
         observeUserFinanceData()
     }
