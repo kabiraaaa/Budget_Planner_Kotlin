@@ -2,6 +2,7 @@ package com.sample.budgetplanner
 
 import android.app.Activity
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.lifecycleScope
@@ -17,6 +18,7 @@ import kotlinx.coroutines.launch
 class IntroLoginBottomSheet : BottomSheetDialogFragment(R.layout.bottom_sheet_intro_login) {
 
     private lateinit var binding: BottomSheetIntroLoginBinding
+    private val TAG = "IntroLoginBottomSheet"
 
     // Use googleSignInResultLauncher for handling sign-in results
     private val googleSignInResultLauncher = registerForActivityResult(
@@ -53,13 +55,15 @@ class IntroLoginBottomSheet : BottomSheetDialogFragment(R.layout.bottom_sheet_in
                 val userAge = DataStoreHelper.getUserAge(requireContext()).firstOrNull()
                 val userGender = DataStoreHelper.getUserGender(requireContext()).firstOrNull()
 
+                Log.d(TAG, "goalsExist: $goalsExist, salaryExists: $salaryExists, spendExists: $spendExists, userName: $userName, userAge: $userAge, userGender: $userGender")
+
                 if (!goalsExist) {
                     // Navigate to goals fragment if goals are not set
                     findNavController().navigate(R.id.action_introLoginBottomSheet_to_introInvestmentFragment)
                 } else if (!salaryExists || !spendExists) {
                     // Navigate to income fragment if salary or spend is not set
                     findNavController().navigate(R.id.action_introLoginBottomSheet_to_introBudgetFragment)
-                } else if (!userName.isNullOrEmpty() && !userAge.isNullOrEmpty() && !userGender.isNullOrEmpty()) {
+                } else if (userName.isNullOrEmpty() && userAge.isNullOrEmpty() && userGender.isNullOrEmpty()) {
                     findNavController().navigate(R.id.action_introLoginBottomSheet_to_introIncomeFragment)
                 }
                 else {

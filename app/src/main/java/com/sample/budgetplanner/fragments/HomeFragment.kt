@@ -14,13 +14,14 @@ import com.sample.budgetplanner.FabAddExpenseBottomSheet
 import com.sample.budgetplanner.MyApp
 import com.sample.budgetplanner.R
 import com.sample.budgetplanner.TransactionsRepository
+import com.sample.budgetplanner.adapters.TransactionsAdapter
 import com.sample.budgetplanner.databinding.FragmentHomeBinding
 import com.sample.budgetplanner.models.Transactions
+import com.sample.budgetplanner.utils.DataStoreHelper
 import com.sample.budgetplanner.utils.DataStoreHelper.getMonthlySalary
 import com.sample.budgetplanner.utils.DataStoreHelper.getMonthlySpend
 import com.sample.budgetplanner.view_models.TransactionsViewModel
 import com.sample.budgetplanner.view_models.TransactionsViewModelFactory
-import com.sample.budgetplanner.adapters.TransactionsAdapter
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -55,7 +56,8 @@ class HomeFragment : Fragment(R.layout.fragment_home), FabAddExpenseBottomSheet.
             )
         }
 
-        showProfileImageAndName()
+        showProfileImage()
+        setUserName()
         setUpTotalAmountAndMonth()
     }
 
@@ -64,7 +66,8 @@ class HomeFragment : Fragment(R.layout.fragment_home), FabAddExpenseBottomSheet.
             "Month: ${SimpleDateFormat("MMMM", Locale.getDefault()).format(Date())}"
 
         transactionViewModel.getTotalAmount().observe(viewLifecycleOwner) { totalAmount ->
-            binding.tvTotalAmount.text = "${Currency.getInstance(Locale.getDefault()).symbol} ${totalAmount ?: 0.0}"
+            binding.tvTotalAmount.text =
+                "${Currency.getInstance(Locale.getDefault()).symbol} ${totalAmount ?: 0.0}"
         }
         observeUserFinanceData()
     }
@@ -95,7 +98,8 @@ class HomeFragment : Fragment(R.layout.fragment_home), FabAddExpenseBottomSheet.
 
                 // Calculate and display the balance
                 val balance = salary - (spend + transactionAmount)
-                binding.tvBalance.text = "Balance: ${Currency.getInstance(Locale.getDefault()).symbol} $balance"
+                binding.tvBalance.text =
+                    "Balance: ${Currency.getInstance(Locale.getDefault()).symbol} $balance"
             }
         }
 
@@ -103,7 +107,7 @@ class HomeFragment : Fragment(R.layout.fragment_home), FabAddExpenseBottomSheet.
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun showProfileImageAndName() {
+    private fun showProfileImage() {
         val user = FirebaseAuth.getInstance().currentUser
         val photoUrl = user?.photoUrl
 
@@ -113,8 +117,30 @@ class HomeFragment : Fragment(R.layout.fragment_home), FabAddExpenseBottomSheet.
                 .into(binding.ivHomeProfile)
         }
         binding.tvGreetings.text = showGreetingBasedOnTime()
-        binding.tvUserName.text = user?.displayName
     }
+
+    private fun setUserName() {
+        // Launch coroutine to get DataStore value
+        lifecycleScope.launch {
+            // Collect the flow from DataStore
+            val dataStoreUserName = DataStoreHelper.getUserName(requireActivity()).firstOrNull()
+
+            // Get FirebaseAuth user
+            val user = FirebaseAuth.getInstance().currentUser
+
+            // Check if DataStore username is available
+            val displayName = if (!dataStoreUserName.isNullOrEmpty()) {
+                dataStoreUserName
+            } else {
+                // Fallback to FirebaseAuth displayName
+                user?.displayName ?: "Guest"  // Fallback to "Guest" if both are null
+            }
+
+            // Set the TextView with the fetched name
+            binding.tvUserName.text = displayName
+        }
+    }
+
 
     private fun initRecyclerView() {
         binding.rvRecentTransactions.layoutManager = LinearLayoutManager(requireActivity())

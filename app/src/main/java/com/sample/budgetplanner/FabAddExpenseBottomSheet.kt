@@ -13,7 +13,7 @@ class FabAddExpenseBottomSheet(private val listener: AddExpense) :
 
     private lateinit var binding: BottomSheetFabAddExpenseBinding
     private val currentDate: String =
-        SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Calendar.getInstance().time)
+        SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(Calendar.getInstance().time)
     private val currentTime: String =
         SimpleDateFormat("HH:mm", Locale.getDefault()).format(Calendar.getInstance().time)
 
