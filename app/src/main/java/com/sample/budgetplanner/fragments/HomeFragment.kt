@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
@@ -60,11 +61,23 @@ class HomeFragment : Fragment(R.layout.fragment_home), FabAddExpenseBottomSheet.
 
         initRecyclerView()
 
+        handleBackPress()
+
         initClickListeners()
 
         showProfileImage()
         setUserName()
         setUpTotalAmountAndMonth()
+    }
+
+    private fun handleBackPress() {
+        requireActivity().onBackPressedDispatcher.addCallback(
+            viewLifecycleOwner,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    requireActivity().finishAffinity()
+                }
+            })
     }
 
     private fun initClickListeners() {
