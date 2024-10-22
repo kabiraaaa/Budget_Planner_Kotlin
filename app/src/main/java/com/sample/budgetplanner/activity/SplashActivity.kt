@@ -19,12 +19,9 @@ class SplashActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-//        binding = ActivitySplashScreenBinding.inflate(layoutInflater)
-//        setContentView(binding.root)
-
-        CoroutineScope(Dispatchers.IO).launch{
-            RemoteConfigHelper.initializeRemoteConfig()
-        }
+//        CoroutineScope(Dispatchers.IO).launch{
+//            RemoteConfigHelper.initializeRemoteConfig()
+//        }
 
         CoroutineScope(Dispatchers.Main).launch {
             delay(1500)

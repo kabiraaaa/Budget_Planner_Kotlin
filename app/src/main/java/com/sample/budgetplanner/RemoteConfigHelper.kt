@@ -20,7 +20,7 @@ object RemoteConfigHelper {
         remoteConfig.fetchAndActivate()
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    updateAdsControlWizard()
+//                    updateAdsControlWizard()
                 } else {
                     Log.d(TAG, "initializeRemoteConfig: Failed")
                 }
