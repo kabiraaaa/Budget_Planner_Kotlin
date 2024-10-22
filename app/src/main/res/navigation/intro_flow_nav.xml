@@ -60,10 +60,19 @@
         android:id="@+id/homeFragment"
         android:name="com.sample.budgetplanner.fragments.HomeFragment"
         android:label="fragment_home"
-        tools:layout="@layout/fragment_home" />
+        tools:layout="@layout/fragment_home" >
+        <action
+            android:id="@+id/action_homeFragment_to_firebaseProfileUpdateFragment"
+            app:destination="@id/firebaseProfileUpdateFragment" />
+    </fragment>
     <fragment
         android:id="@+id/splashFragment"
         android:name="com.sample.budgetplanner.fragments.SplashFragment"
         android:label="fragment_splash"
         tools:layout="@layout/fragment_splash" />
+    <fragment
+        android:id="@+id/firebaseProfileUpdateFragment"
+        android:name="com.sample.budgetplanner.fragments.FirebaseProfileUpdateFragment"
+        android:label="fragment_firebase_profile_update"
+        tools:layout="@layout/fragment_firebase_profile_update" />
 </navigation>

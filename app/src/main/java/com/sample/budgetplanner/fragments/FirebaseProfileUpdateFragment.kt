@@ -1,5 +1,7 @@
 package com.sample.budgetplanner.fragments
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -7,26 +9,27 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
 import com.sample.budgetplanner.R
+import com.sample.budgetplanner.databinding.FragmentFirebaseProfileUpdateBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-class FirebaseProfileUpdateFragment : Fragment() {
+class FirebaseProfileUpdateFragment : Fragment(R.layout.fragment_firebase_profile_update) {
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_firebase_profile_update, container, false)
-    }
+    private lateinit var binding: FragmentFirebaseProfileUpdateBinding
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-//        CoroutineScope(Dispatchers.Main).launch {
-//            delay(3000)
-//            findNavController().navigate(R.id.action_firebaseProfileUpdateFragment_to_homeFragment)
-//        }
+        binding = FragmentFirebaseProfileUpdateBinding.bind(view)
+
+        binding.btnReqAccDeletion.setOnClickListener {
+            val url = "https://forms.gle/hPbEJNXqFeRUoXVj9"
+            val intent = Intent(Intent.ACTION_VIEW).apply {
+                data = Uri.parse(url)
+            }
+            startActivity(intent)
+        }
+
     }
 }

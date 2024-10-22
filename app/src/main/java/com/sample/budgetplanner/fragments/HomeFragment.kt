@@ -14,6 +14,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.google.android.gms.auth.api.Auth
@@ -60,14 +61,11 @@ class HomeFragment : Fragment(R.layout.fragment_home), FabAddExpenseBottomSheet.
         transactionViewModel = ViewModelProvider(this, factory)[TransactionsViewModel::class.java]
 
         initRecyclerView()
-
-        handleBackPress()
-
         initClickListeners()
-
         showProfileImage()
         setUserName()
         setUpTotalAmountAndMonth()
+        handleBackPress()
     }
 
     private fun handleBackPress() {
@@ -90,6 +88,12 @@ class HomeFragment : Fragment(R.layout.fragment_home), FabAddExpenseBottomSheet.
         binding.tvSignInPending.setOnClickListener {
             val signInIntent = AuthUtils.getGoogleSignInIntent(requireActivity())
             googleSignInResultLauncher.launch(signInIntent)
+        }
+
+        if (FirebaseAuth.getInstance().currentUser != null) {
+            binding.ivHomeProfile.setOnClickListener {
+                findNavController().navigate(R.id.action_homeFragment_to_firebaseProfileUpdateFragment)
+            }
         }
     }
 
