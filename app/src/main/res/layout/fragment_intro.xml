@@ -35,7 +35,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:text="Welcome to App"
+            android:text="Welcome to Expense Tracker"
             android:textColor="#1A1C29"
             android:textSize="24sp"
             android:textStyle="bold"
@@ -52,8 +52,7 @@
             android:layout_marginVertical="12dp"
             android:gravity="center"
             android:paddingHorizontal="32dp"
-            android:text="Here’s a good place for a brief overview
-of the app or it’s key features."
+            android:text="Track your spending effortlessly and take control of your finances."
             android:textColor="#797979"
             android:textSize="15sp"
             app:layout_constraintBottom_toTopOf="@id/btnGetStarted"

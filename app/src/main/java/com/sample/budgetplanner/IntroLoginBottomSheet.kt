@@ -4,6 +4,7 @@ import android.app.Activity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -28,11 +29,14 @@ class IntroLoginBottomSheet : BottomSheetDialogFragment(R.layout.bottom_sheet_in
         if (result.resultCode == Activity.RESULT_OK && data != null) {
             val signInResult = Auth.GoogleSignInApi.getSignInResultFromIntent(data)
             if (signInResult?.isSuccess == true) {
-                findNavController().navigate(R.id.action_introLoginBottomSheet_to_firebaseProfileUpdateFragment)
                 val account = signInResult.signInAccount
-                account?.let { firebaseAuthWithGoogle(requireActivity(), it) }
+                account?.let {
+                    firebaseAuthWithGoogle(requireActivity(), it)
+                    checkDataStoreValuesAndNavigate()
+                }
             } else {
-                // Google Sign In Failed
+                Log.e(TAG, "Google Sign-In Failed")
+                Toast.makeText(requireContext(), "Google Sign-In Failed", Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -45,33 +49,7 @@ class IntroLoginBottomSheet : BottomSheetDialogFragment(R.layout.bottom_sheet_in
 
     private fun initClickListeners() {
         binding.btnSkip.setOnClickListener {
-            lifecycleScope.launch {
-                // Check if the required DataStore values exist
-                val goalsExist = DataStoreHelper.getUserGoals(requireContext()).firstOrNull()?.isNotEmpty() == true
-                val salaryExists = DataStoreHelper.getMonthlySalary(requireContext()).firstOrNull() ?: 0.0 > 0.0
-                val spendExists = DataStoreHelper.getMonthlySpend(requireContext()).firstOrNull() ?: 0.0 > 0.0
-
-                val userName = DataStoreHelper.getUserName(requireContext()).firstOrNull()
-                val userAge = DataStoreHelper.getUserAge(requireContext()).firstOrNull()
-                val userGender = DataStoreHelper.getUserGender(requireContext()).firstOrNull()
-
-                Log.d(TAG, "goalsExist: $goalsExist, salaryExists: $salaryExists, spendExists: $spendExists, userName: $userName, userAge: $userAge, userGender: $userGender")
-
-                if (!goalsExist) {
-                    // Navigate to goals fragment if goals are not set
-                    findNavController().navigate(R.id.action_introLoginBottomSheet_to_introInvestmentFragment)
-                } else if (!salaryExists || !spendExists) {
-                    // Navigate to income fragment if salary or spend is not set
-                    findNavController().navigate(R.id.action_introLoginBottomSheet_to_introBudgetFragment)
-                } else if (userName.isNullOrEmpty() && userAge.isNullOrEmpty() && userGender.isNullOrEmpty()) {
-                    findNavController().navigate(R.id.action_introLoginBottomSheet_to_introIncomeFragment)
-                }
-                else {
-                    // If all data exists, proceed to the next step
-                    dismiss()
-                    findNavController().navigate(R.id.action_introLoginBottomSheet_to_homeFragment)
-                }
-            }
+            checkDataStoreValuesAndNavigate()
         }
 
         binding.btnLoginGoogle.setOnClickListener {
@@ -79,4 +57,62 @@ class IntroLoginBottomSheet : BottomSheetDialogFragment(R.layout.bottom_sheet_in
             googleSignInResultLauncher.launch(signInIntent)
         }
     }
+
+    private fun checkDataStoreValuesAndNavigate() {
+        lifecycleScope.launch {
+            val dataStoreValues = checkDataStoreValues()
+
+            Log.d(
+                TAG,
+                "DataStore values: $dataStoreValues"
+            )
+
+            when {
+                dataStoreValues.userName.isNullOrEmpty() &&
+                        dataStoreValues.userAge.isNullOrEmpty() &&
+                        dataStoreValues.userGender.isNullOrEmpty() -> {
+                    findNavController().navigate(R.id.action_introLoginBottomSheet_to_introIncomeFragment)
+                }
+
+                !dataStoreValues.goalsExist -> {
+                    findNavController().navigate(R.id.action_introLoginBottomSheet_to_introInvestmentFragment)
+                }
+
+                !dataStoreValues.salaryExists || !dataStoreValues.spendExists -> {
+                    findNavController().navigate(R.id.action_introLoginBottomSheet_to_introBudgetFragment)
+                }
+
+                else -> {
+                    dismiss()
+                    findNavController().navigate(R.id.action_introLoginBottomSheet_to_homeFragment)
+                }
+            }
+        }
+    }
+
+    // Helper function to check DataStore values
+    private suspend fun checkDataStoreValues(): DataStoreValues {
+        val userName = DataStoreHelper.getUserName(requireContext()).firstOrNull()
+        val userAge = DataStoreHelper.getUserAge(requireContext()).firstOrNull()
+        val userGender = DataStoreHelper.getUserGender(requireContext()).firstOrNull()
+
+        val goalsExist =
+            DataStoreHelper.getUserGoals(requireContext()).firstOrNull()?.isNotEmpty() == true
+        val salaryExists =
+            DataStoreHelper.getMonthlySalary(requireContext()).firstOrNull() ?: 0.0 > 0.0
+        val spendExists =
+            DataStoreHelper.getMonthlySpend(requireContext()).firstOrNull() ?: 0.0 > 0.0
+
+        return DataStoreValues(userName, userAge, userGender, goalsExist, salaryExists, spendExists)
+    }
+
+    // Data class to hold DataStore values
+    data class DataStoreValues(
+        val userName: String?,
+        val userAge: String?,
+        val userGender: String?,
+        val goalsExist: Boolean,
+        val salaryExists: Boolean,
+        val spendExists: Boolean
+    )
 }

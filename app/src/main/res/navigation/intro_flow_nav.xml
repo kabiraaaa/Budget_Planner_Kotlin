@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/intro_flow_nav"
-    app:startDestination="@id/introFragment">
+    app:startDestination="@id/splashFragment">
 
     <fragment
         android:id="@+id/introInvestmentFragment"
@@ -38,9 +38,6 @@
             android:id="@+id/action_introLoginBottomSheet_to_introIncomeFragment"
             app:destination="@id/introIncomeFragment" />
         <action
-            android:id="@+id/action_introLoginBottomSheet_to_firebaseProfileUpdateFragment"
-            app:destination="@id/firebaseProfileUpdateFragment" />
-        <action
             android:id="@+id/action_introLoginBottomSheet_to_introInvestmentFragment"
             app:destination="@id/introInvestmentFragment" />
         <action
@@ -65,12 +62,8 @@
         android:label="fragment_home"
         tools:layout="@layout/fragment_home" />
     <fragment
-        android:id="@+id/firebaseProfileUpdateFragment"
-        android:name="com.sample.budgetplanner.fragments.FirebaseProfileUpdateFragment"
-        android:label="fragment_firebase_profile_update"
-        tools:layout="@layout/fragment_firebase_profile_update" >
-        <action
-            android:id="@+id/action_firebaseProfileUpdateFragment_to_homeFragment"
-            app:destination="@id/homeFragment" />
-    </fragment>
+        android:id="@+id/splashFragment"
+        android:name="com.sample.budgetplanner.fragments.SplashFragment"
+        android:label="fragment_splash"
+        tools:layout="@layout/fragment_splash" />
 </navigation>

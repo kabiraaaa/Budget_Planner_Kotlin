@@ -1,15 +1,25 @@
 package com.sample.budgetplanner.fragments
 
+import android.app.Activity
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.View
+import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
+import com.google.android.gms.auth.api.Auth
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.GoogleAuthProvider
+import com.sample.budgetplanner.AuthUtils
+import com.sample.budgetplanner.AuthUtils.firebaseAuthWithGoogle
 import com.sample.budgetplanner.FabAddExpenseBottomSheet
 import com.sample.budgetplanner.MyApp
 import com.sample.budgetplanner.R
@@ -48,6 +58,14 @@ class HomeFragment : Fragment(R.layout.fragment_home), FabAddExpenseBottomSheet.
 
         initRecyclerView()
 
+        initClickListeners()
+
+        showProfileImage()
+        setUserName()
+        setUpTotalAmountAndMonth()
+    }
+
+    private fun initClickListeners() {
         binding.fabHomeAdd.setOnClickListener {
             val fabAddExpenseBottomSheet = FabAddExpenseBottomSheet(this)
             fabAddExpenseBottomSheet.show(
@@ -55,11 +73,49 @@ class HomeFragment : Fragment(R.layout.fragment_home), FabAddExpenseBottomSheet.
                 "ModalBottomSheet"
             )
         }
-
-        showProfileImage()
-        setUserName()
-        setUpTotalAmountAndMonth()
+        binding.tvSignInPending.setOnClickListener {
+            val signInIntent = AuthUtils.getGoogleSignInIntent(requireActivity())
+            googleSignInResultLauncher.launch(signInIntent)
+        }
     }
+
+    private val googleSignInResultLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        val data = result.data
+        if (result.resultCode == Activity.RESULT_OK && data != null) {
+            val signInResult = Auth.GoogleSignInApi.getSignInResultFromIntent(data)
+            if (signInResult?.isSuccess == true) {
+                val account = signInResult.signInAccount
+                account?.let {
+                    // Call firebaseAuthWithGoogle and pass a callback to hide tvSignInPending
+                    firebaseAuthWithGoogle(requireActivity(), it) {
+                        // This will be called after Firebase auth is successfully completed
+                        binding.tvSignInPending.visibility = View.GONE
+                    }
+                }
+            } else {
+                Log.e(TAG, "Google Sign-In Failed")
+                Toast.makeText(requireContext(), "Google Sign-In Failed", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+
+    private fun firebaseAuthWithGoogle(activity: FragmentActivity, account: GoogleSignInAccount, onSuccess: () -> Unit) {
+        val credential = GoogleAuthProvider.getCredential(account.idToken, null)
+        FirebaseAuth.getInstance().signInWithCredential(credential)
+            .addOnCompleteListener(activity) { task ->
+                if (task.isSuccessful) {
+                    // Call the success callback once Firebase authentication is successful
+                    onSuccess()
+                } else {
+                    Log.e(TAG, "Firebase Authentication Failed")
+                    Toast.makeText(activity, "Firebase Authentication Failed", Toast.LENGTH_SHORT).show()
+                }
+            }
+    }
+
 
     private fun setUpTotalAmountAndMonth() {
         binding.tvTotalAmountMonth.text =
@@ -67,22 +123,18 @@ class HomeFragment : Fragment(R.layout.fragment_home), FabAddExpenseBottomSheet.
 
         transactionViewModel.getTotalAmount().observe(viewLifecycleOwner) { totalAmount ->
             binding.tvTotalAmount.text =
-                "${Currency.getInstance(Locale.getDefault()).symbol} ${totalAmount ?: 0.0}"
+                "${Currency.getInstance(Locale.getDefault()).symbol}${totalAmount ?: 0.0}"
         }
         observeUserFinanceData()
     }
 
     private fun observeUserFinanceData() {
-        // Observe the user's monthly salary from DataStore and display it
         lifecycleScope.launch {
-            // Collect the monthly salary from DataStore
             val salary = getMonthlySalary(requireContext()).firstOrNull() ?: 0.0
 
-            // Display the monthly salary with currency symbol
             val formattedSalary = "${Currency.getInstance(Locale.getDefault()).symbol} $salary"
             binding.tvIncomingAmount.text = formattedSalary
 
-            // Get the monthly spend from DataStore
             val spend = getMonthlySpend(requireContext()).firstOrNull() ?: 0.0
 
             // Observe the total transactions for the current month
@@ -92,8 +144,6 @@ class HomeFragment : Fragment(R.layout.fragment_home), FabAddExpenseBottomSheet.
                 // Combine monthly spend and current month's transactions
                 val combinedAmount =
                     "${Currency.getInstance(Locale.getDefault()).symbol} ${spend + transactionAmount}"
-
-                // Display the combined outgoing amount in the TextView
                 binding.tvOutgoingAmount.text = combinedAmount
 
                 // Calculate and display the balance
@@ -102,8 +152,6 @@ class HomeFragment : Fragment(R.layout.fragment_home), FabAddExpenseBottomSheet.
                     "Balance: ${Currency.getInstance(Locale.getDefault()).symbol} $balance"
             }
         }
-
-
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -146,10 +194,21 @@ class HomeFragment : Fragment(R.layout.fragment_home), FabAddExpenseBottomSheet.
         binding.rvRecentTransactions.layoutManager = LinearLayoutManager(requireActivity())
         val adapter = TransactionsAdapter(requireActivity())
         binding.rvRecentTransactions.adapter = adapter
+
         transactionViewModel.getAllTransactions().observe(viewLifecycleOwner) { transactions ->
             adapter.submitList(transactions)
+
+            // Show or hide 'No transactions' TextView based on the list size
+            if (transactions.isNullOrEmpty()) {
+                binding.tvNoTransactionsAdded.visibility = View.VISIBLE
+                binding.rvRecentTransactions.visibility = View.GONE
+            } else {
+                binding.tvNoTransactionsAdded.visibility = View.GONE
+                binding.rvRecentTransactions.visibility = View.VISIBLE
+            }
         }
     }
+
 
     override fun onExpenseAdded(
         name: String,
@@ -163,6 +222,14 @@ class HomeFragment : Fragment(R.layout.fragment_home), FabAddExpenseBottomSheet.
         transactionViewModel.insertTransaction(
             Transactions(0, name, amount, category, paymentMode, currentDate, currentTime, notes)
         )
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Log.d(TAG, "FirebaseUSer- ${FirebaseAuth.getInstance().currentUser}")
+        if (FirebaseAuth.getInstance().currentUser == null) binding.tvSignInPending.visibility =
+            View.VISIBLE
+        else binding.tvSignInPending.visibility = View.GONE
     }
 
     @RequiresApi(Build.VERSION_CODES.O)

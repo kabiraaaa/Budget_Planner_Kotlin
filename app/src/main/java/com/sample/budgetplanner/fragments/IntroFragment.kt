@@ -13,6 +13,7 @@ import com.sample.budgetplanner.databinding.FragmentIntroBinding
 import com.sample.budgetplanner.fragments.onBoardingSlides.OnBoardingSlideOneFragment
 import com.sample.budgetplanner.fragments.onBoardingSlides.OnBoardingSlideThreeFragment
 import com.sample.budgetplanner.fragments.onBoardingSlides.OnBoardingSlideTwoFragment
+import com.sample.budgetplanner.utils.DataStoreHelper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -32,6 +33,9 @@ class IntroFragment : Fragment(R.layout.fragment_intro) {
         binding = FragmentIntroBinding.bind(view)
 
         binding.btnGetStarted.setOnClickListener {
+            CoroutineScope(Dispatchers.Default).launch {
+                DataStoreHelper.saveOnBoardingStatus(requireContext(), true)
+            }
             findNavController().navigate(R.id.introLoginBottomSheet)
         }
 

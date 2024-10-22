@@ -51,6 +51,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_premium"
+            android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -202,14 +203,44 @@
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:paddingVertical="8dp"
+                android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/tvRecentTransactions"
                 tools:itemCount="40"
                 tools:listitem="@layout/item_transactions" />
 
+            <TextView
+                android:id="@+id/tvNoTransactionsAdded"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="16dp"
+                android:paddingHorizontal="40dp"
+                android:paddingVertical="80dp"
+                android:text="No transaction added, please start by adding from FAB below."
+                android:textColor="@android:color/black"
+                android:textSize="16sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tvRecentTransactions" />
+
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
+
+    <TextView
+        android:id="@+id/tvSignInPending"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/homeChipColorSelected"
+        android:gravity="center"
+        android:visibility="gone"
+        android:paddingVertical="8dp"
+        android:text="Login pending, Click to Login with Google."
+        android:textColor="@color/white"
+        app:layout_constraintBottom_toTopOf="@id/clBottomSummary"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/clBottomSummary"
