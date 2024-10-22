@@ -42,10 +42,10 @@
             android:orientation="vertical">
 
             <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
                 android:layout_marginVertical="8dp"
-                android:src="@mipmap/ic_launcher" />
+                android:src="@drawable/vector_save_money" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -66,10 +66,10 @@
             android:orientation="vertical">
 
             <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
                 android:layout_marginVertical="8dp"
-                android:src="@mipmap/ic_launcher" />
+                android:src="@drawable/vector_budgeting" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -90,10 +90,10 @@
             android:orientation="vertical">
 
             <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
                 android:layout_marginVertical="8dp"
-                android:src="@mipmap/ic_launcher" />
+                android:src="@drawable/vector_track_spends" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -114,10 +114,10 @@
             android:orientation="vertical">
 
             <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
                 android:layout_marginVertical="8dp"
-                android:src="@mipmap/ic_launcher" />
+                android:src="@drawable/vector_track_income" />
 
             <TextView
                 android:layout_width="wrap_content"
