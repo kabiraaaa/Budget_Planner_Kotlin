@@ -1,6 +1,7 @@
 package com.sample.budgetplanner.fragments
 
 import android.app.Activity
+import android.content.Context
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -18,8 +19,8 @@ import com.google.android.gms.auth.api.Auth
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
+import com.google.firebase.firestore.FirebaseFirestore
 import com.sample.budgetplanner.AuthUtils
-import com.sample.budgetplanner.AuthUtils.firebaseAuthWithGoogle
 import com.sample.budgetplanner.FabAddExpenseBottomSheet
 import com.sample.budgetplanner.MyApp
 import com.sample.budgetplanner.R
@@ -32,6 +33,7 @@ import com.sample.budgetplanner.utils.DataStoreHelper.getMonthlySalary
 import com.sample.budgetplanner.utils.DataStoreHelper.getMonthlySpend
 import com.sample.budgetplanner.view_models.TransactionsViewModel
 import com.sample.budgetplanner.view_models.TransactionsViewModelFactory
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -69,8 +71,7 @@ class HomeFragment : Fragment(R.layout.fragment_home), FabAddExpenseBottomSheet.
         binding.fabHomeAdd.setOnClickListener {
             val fabAddExpenseBottomSheet = FabAddExpenseBottomSheet(this)
             fabAddExpenseBottomSheet.show(
-                requireActivity().supportFragmentManager,
-                "ModalBottomSheet"
+                requireActivity().supportFragmentManager, "ModalBottomSheet"
             )
         }
         binding.tvSignInPending.setOnClickListener {
@@ -102,7 +103,9 @@ class HomeFragment : Fragment(R.layout.fragment_home), FabAddExpenseBottomSheet.
     }
 
 
-    private fun firebaseAuthWithGoogle(activity: FragmentActivity, account: GoogleSignInAccount, onSuccess: () -> Unit) {
+    private fun firebaseAuthWithGoogle(
+        activity: FragmentActivity, account: GoogleSignInAccount, onSuccess: () -> Unit
+    ) {
         val credential = GoogleAuthProvider.getCredential(account.idToken, null)
         FirebaseAuth.getInstance().signInWithCredential(credential)
             .addOnCompleteListener(activity) { task ->
@@ -111,7 +114,8 @@ class HomeFragment : Fragment(R.layout.fragment_home), FabAddExpenseBottomSheet.
                     onSuccess()
                 } else {
                     Log.e(TAG, "Firebase Authentication Failed")
-                    Toast.makeText(activity, "Firebase Authentication Failed", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(activity, "Firebase Authentication Failed", Toast.LENGTH_SHORT)
+                        .show()
                 }
             }
     }
@@ -160,9 +164,7 @@ class HomeFragment : Fragment(R.layout.fragment_home), FabAddExpenseBottomSheet.
         val photoUrl = user?.photoUrl
 
         if (photoUrl != null) {
-            Glide.with(this)
-                .load(photoUrl)
-                .into(binding.ivHomeProfile)
+            Glide.with(this).load(photoUrl).into(binding.ivHomeProfile)
         }
         binding.tvGreetings.text = showGreetingBasedOnTime()
     }
@@ -219,17 +221,22 @@ class HomeFragment : Fragment(R.layout.fragment_home), FabAddExpenseBottomSheet.
         currentDate: String,
         currentTime: String
     ) {
-        transactionViewModel.insertTransaction(
+        val newTransaction =
             Transactions(0, name, amount, category, paymentMode, currentDate, currentTime, notes)
-        )
+        transactionViewModel.insertTransaction(newTransaction)
+        saveTransactionToFirestore(newTransaction)
+
     }
 
     override fun onResume() {
         super.onResume()
         Log.d(TAG, "FirebaseUSer- ${FirebaseAuth.getInstance().currentUser}")
-        if (FirebaseAuth.getInstance().currentUser == null) binding.tvSignInPending.visibility =
-            View.VISIBLE
-        else binding.tvSignInPending.visibility = View.GONE
+        if (FirebaseAuth.getInstance().currentUser == null) {
+            binding.tvSignInPending.visibility = View.VISIBLE
+        } else {
+            binding.tvSignInPending.visibility = View.GONE
+            saveProfileToFirestore(requireActivity())
+        }
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -242,4 +249,71 @@ class HomeFragment : Fragment(R.layout.fragment_home), FabAddExpenseBottomSheet.
             else -> "Good Night!"
         }
     }
+
+    private fun saveProfileToFirestore(context: Context) {
+        val user = FirebaseAuth.getInstance().currentUser
+        if (user != null) {
+            val userEmail = user.email ?: return
+            val profileRef = FirebaseFirestore.getInstance().collection("users").document(userEmail)
+
+            // Retrieve DataStore values
+            lifecycleScope.launch {
+                // Collect values from DataStoreHelper
+                val onBoarded = DataStoreHelper.getOnBoardingStatus(context).first()
+                val name = DataStoreHelper.getUserName(context).first()
+                val age = DataStoreHelper.getUserAge(context).first()
+                val gender = DataStoreHelper.getUserGender(context).first()
+                val goals = DataStoreHelper.getUserGoals(context).first()
+                val monthlySpend = getMonthlySpend(context).first()
+                val monthlySalary = getMonthlySalary(context).first()
+
+                // Convert Set<String> goals to List<String>
+                val goalsList = goals.toList()
+
+                // Check if the profile data already exists
+                profileRef.get().addOnSuccessListener { document ->
+                    if (!document.exists()) {
+                        // If document doesn't exist, create a new user profile
+                        val userProfile = hashMapOf(
+                            "onBoarded" to onBoarded,
+                            "name" to name,
+                            "age" to age,
+                            "gender" to gender,
+                            "goals" to goalsList,
+                            "monthlySpend" to monthlySpend,
+                            "monthlySalary" to monthlySalary
+                        )
+
+                        // Save profile to Firestore
+                        profileRef.set(userProfile).addOnSuccessListener {
+                            Log.d("Firestore", "User profile added successfully")
+                        }.addOnFailureListener { e ->
+                            Log.w("Firestore", "Error adding profile", e)
+                        }
+                    } else {
+                        Log.d("Firestore", "Profile already exists")
+                    }
+                }
+            }
+        }
+    }
+
+    private fun saveTransactionToFirestore(transaction: Transactions) {
+        val user = FirebaseAuth.getInstance().currentUser
+        if (user != null) {
+            val userEmail = user.email ?: return
+            val transactionsRef = FirebaseFirestore.getInstance()
+                .collection("users")
+                .document(userEmail)
+                .collection("transactions")
+
+            // Add the transaction to Firestore
+            transactionsRef.add(transaction).addOnSuccessListener {
+                Log.d("Firestore", "Transaction added successfully")
+            }.addOnFailureListener { e ->
+                Log.w("Firestore", "Error adding transaction", e)
+            }
+        }
+    }
+
 }
