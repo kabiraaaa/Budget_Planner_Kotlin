@@ -164,7 +164,7 @@ class HomeFragment : Fragment(R.layout.fragment_home), FabAddExpenseBottomSheet.
         val photoUrl = user?.photoUrl
 
         if (photoUrl != null) {
-            Glide.with(this).load(photoUrl).into(binding.ivHomeProfile)
+            Glide.with(this).load(photoUrl).circleCrop().into(binding.ivHomeProfile)
         }
         binding.tvGreetings.text = showGreetingBasedOnTime()
     }
